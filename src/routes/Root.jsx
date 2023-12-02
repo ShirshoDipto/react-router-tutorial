@@ -7,12 +7,13 @@ import {
   useNavigation,
 } from "react-router-dom";
 import { getContacts, createContact } from "../contacts";
+import { useEffect } from "react";
 
 export async function loader({ request }) {
   const url = new URL(request.url);
   const q = url.searchParams.get("q");
   const contacts = await getContacts(q);
-  return { contacts };
+  return { contacts, q };
 }
 
 export async function action() {
@@ -21,9 +22,13 @@ export async function action() {
 }
 
 const Root = () => {
-  const { contacts } = useLoaderData();
+  const { contacts, q } = useLoaderData();
   const navigation = useNavigation();
   console.log("Root rendered...");
+
+  useEffect(() => {
+    document.getElementById("q").value = q;
+  }, [q]);
 
   return (
     <>
@@ -37,6 +42,7 @@ const Root = () => {
               placeholder="Search"
               type="search"
               name="q"
+              defaultValue={q}
             />
             <div id="search-spinner" aria-hidden hidden={true} />
             <div className="sr-only" aria-live="polite"></div>
